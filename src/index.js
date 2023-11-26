@@ -4,45 +4,27 @@ import bcrypt from "bcrypt";
 const app = express();
 app.use(express.json());
 
-let lista_usuarios = [
-    [
-        {
-            id: 9999,
-            nome: "Main Reyna",
-            email: "souplatina@gmail.com",
-            senha: "NãOaBr0ObOmB",
-            recados: [ {
-                id: 777,
-                titulo: "Dropa Aí Men",
-                descricao:"To sem dinheiro, compra pra mim?"
-              }]
-        },
-        {
-            id: 9998,
-            nome: "Suporte de Dano",
-            email: "naowardo@bol.com.br",
-            senha: "opspegueiseufarm",
-            recados: [ {
-                id: 666,
-                titulo: "Lembrete",
-                descricao:"Comprar Capuz da Morte de Rabadon"
-              }]
-        },
-        {
-            id: 9997,
-            nome: "Uh Tal Du Ak TrOvÃo",
-            email: "cs.css.cs@cs.valve.com",
-            senha: "123456",
-            recados: [ {
-                id: 555,
-                titulo: "É us guri pae",
-                descricao:"Bah, né meo. Tá loko?!"
-              }]
-        }
-      ]
-]
+let lista_usuarios = []
 let contador = 0
 let contadorRecado = 0 
+
+function adicionarTeste(){
+    const novoUsuario = {
+        id: ++contador,
+        nome: "Main Jett Desde o Beta",
+        email: "sojogovalorant@riot.com.br",
+        senha: "123456",
+        recados: [{
+                  id: 555,
+                 titulo: "É us guri pae",
+                 descricao:"Bah, né meo. Tá loko?!"
+                }]
+    }
+    lista_usuarios.push(novoUsuario)
+}
+adicionarTeste()
+
+
 
 app.post('/adicionar-usuario', async (request, response) => {
   const infoRequest = request.body
@@ -115,13 +97,18 @@ app.get('/listar-usuario', (request, response) => {
 app.get('/visualizar-usuario', (request, response) => {
   const parametros = request.query
 
+
+  if (parametros.id === undefined || parametros.id === "") {
+    return response.status(400).json("Informe um id válido")
+  }
+
   let usuario = lista_usuarios.find(usuario => usuario.id == parametros.id)
+
   if (!usuario){
     return response.status(400).json("Usuário não encontrado")
   }
 
   return response.json(usuario);
-  
 });
 
 
