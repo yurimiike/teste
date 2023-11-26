@@ -13,9 +13,9 @@ function adicionarTeste(){
         id: ++contador,
         nome: "Main Jett Desde o Beta",
         email: "sojogovalorant@riot.com.br",
-        senha: "123456",
+        senha: "exemplodesenha",
         recados: [{
-                  id: 555,
+                  id: ++contador,
                  titulo: "É us guri pae",
                  descricao:"Bah, né meo. Tá loko?!"
                 }]
@@ -23,8 +23,6 @@ function adicionarTeste(){
     lista_usuarios.push(novoUsuario)
 }
 adicionarTeste()
-
-
 
 app.post('/adicionar-usuario', async (request, response) => {
   const infoRequest = request.body
@@ -57,18 +55,18 @@ app.post('/adicionar-usuario', async (request, response) => {
   }
   
   lista_usuarios.push(novoUsuario)
-  return response.status(201).json("Usuário adicionado com sucesso")
+  return response.status(201).json("Usuário cadastrado com sucesso")
 });
 
 app.post('/login', async (request, response) => {
   const infoRequest = request.body
 
   if (infoRequest.email === undefined || infoRequest.email === "") {
-    return response.status(400).json("Informe um email válido")
+    return response.status(400).json("Dados incorretos")
   }
 
   if (infoRequest.senha === undefined || infoRequest.senha === "") {
-    return response.status(400).json("Informe uma senha válida")
+    return response.status(400).json("Dados incorretos")
   }
 
   let usuario = lista_usuarios.find(usuario => usuario.email == infoRequest.email)
@@ -88,8 +86,7 @@ app.post('/login', async (request, response) => {
   return response.status(201).json("Usuário logado")
 });
 
-//lembrar de mexer nessa parte aqui 
-app.get('/listar-usuario', (request, response) => {
+app.get('/listar-todos-usuarios', (request, response) => {
     return response.json(lista_usuarios);
     
 });
@@ -111,30 +108,24 @@ app.get('/visualizar-usuario', (request, response) => {
   return response.json(usuario);
 });
 
-
-
-
-//aqui a gente vai pegar o id e mudar alguma coisa nele
 app.put('/alterar-usuario', async (request, response) => {
   const infoRequest = request.body
 
   if (infoRequest.id === undefined || infoRequest.id === "") {
-    return response.status(400).json("Informe um id correto")
+    return response.status(400).json("Dados incorretos")
   }
 
   if (infoRequest.nome === undefined || infoRequest.nome === "") {
-    return response.status(400).json("Informe um nome válido")
+    return response.status(400).json("Dados incorretos")
   }
 
   if (infoRequest.email === undefined || infoRequest.email === "") {
-    return response.status(400).json("Informe um email válido")
+    return response.status(400).json("Dados incorretos")
   }
 
   if (infoRequest.senha === undefined || infoRequest.senha === "") {
-    return response.status(400).json("Informe uma senha válida")
+    return response.status(400).json("Dados incorretos")
   }
-
-  
   const hashedpassword = await bcrypt.hash(infoRequest.senha, 6);
 
   const usuario_alterarado = {
@@ -147,59 +138,30 @@ app.put('/alterar-usuario', async (request, response) => {
 
   let index = lista_usuarios.findIndex(usuario => usuario.id == infoRequest.id)
   if (index === -1){
-    return response.status(400).json("mudar a mensagem")
+    return response.status(400).json("Usuário não encontrado")
   }
 
   lista_usuarios[index] = usuario_alterarado
   return response.status(201).json("Usuário alterarado com sucesso")
 });
 
-
-
-
-
-
-
-//aqui a gente vai deletar, né, não seja burro tbm
 app.delete('/deletar-usuario/', (request, response) => {
   const parametros = request.query
   const idUsuario= parametros.id_usuario
-  // let idUsuario = idRecado <= talvez devesse validar a hash aqui, não sei, vou ver e te aviso. 
   let usuario = lista_usuarios.find(usuario => usuario.id == idUsuario)
   
   if (!usuario){
-     return response.status(400).json("Usuário inválido")
+     return response.status(400).json("Usuário não encontrado")
   }
   
   lista_usuarios = lista_usuarios.filter(usuario => usuario.id != idUsuario)
-  return response.status(200).json('Usuario excluído com sucesso')
+  return response.status(200).json("Usuario excluído com sucesso")
 });
 
-
-  
-
-
-
-
-
-
-
-//--------------------------------------------RECADO----------------------------------------------------
-//--------------------------------------------RECADO----------------------------------------------------
-//--------------------------------------------RECADO----------------------------------------------------
-//--------------------------------------------RECADO----------------------------------------------------
-//--------------------------------------------RECADO----------------------------------------------------
-//--------------------------------------------RECADO----------------------------------------------------
-//--------------------------------------------RECADO----------------------------------------------------
-
-
-
-//aqui a gente vai deletar, né, não seja burro tbm
 app.delete('/deletar-recado/', (request, response) => {
   const parametros = request.query
   const idRecado = parametros.id_recado
   const idUsuario= parametros.id_usuario
-  // let idUsuario = idRecado <= talvez devesse validar a hash aqui, não sei, vou ver e te aviso. 
   let usuario = lista_usuarios.find(usuario => usuario.id == idUsuario)
 
   if (!usuario){
@@ -215,13 +177,6 @@ app.delete('/deletar-recado/', (request, response) => {
   usuario.recados = usuario.recados.filter(recado => recado.id != idRecado)
   return response.status(200).json('Recado excluído com sucesso')
 });
-
-
-app.get('/recados', (request, response) => {
-  return response.json('PODE CONFERIR NO POSTMAN, SE TÁ LÁ, TÁ FUNCIONANDO, PARÇA! :)');
-
-});
-
 
 app.post('/adicionar-recado', (request, response) => {
   const infoRequest = request.body
@@ -249,10 +204,9 @@ app.post('/adicionar-recado', (request, response) => {
       descricao: infoRequest.descricao,
      
   }
-  
   usuario.recados.push(novoRecado)
-  // console.log ('O recado "'+ novoRecado.descricao +'" foi adicionado com sucesso')
-  return response.status(201).json('O recado "'+ novoRecado.descricao +'" foi adicionado com sucesso' )
+  
+  return response.status(201).json('O recado foi adicionado com sucesso' )
 });
 
 app.get('/listar-recado/:id?', (request, response) => {
@@ -286,19 +240,19 @@ app.put('/alterar-recado', async (request, response) => {
   const infoRequest = request.body
 
   if (infoRequest.id_usuario === undefined || infoRequest.id_usuario === "") {
-    return response.status(400).json("Informe um id correto")
+    return response.status(400).json("Dados incorretos")
   }
 
   if (infoRequest.id_recado === undefined || infoRequest.id_recado === "") {
-    return response.status(400).json("Informe um id correto")
+    return response.status(400).json("Dados incorretos")
   }
 
   if (infoRequest.titulo === undefined || infoRequest.titulo === "") {
-    return response.status(400).json("Informe um nome válido")
+    return response.status(400).json("Dados incorretos")
   }
 
   if (infoRequest.descricao === undefined || infoRequest.descricao === "") {
-    return response.status(400).json("Informe um email válido")
+    return response.status(400).json("Dados incorretos")
   }
   
   const recado_modificado = {
@@ -309,12 +263,12 @@ app.put('/alterar-recado', async (request, response) => {
   
   let usuario = lista_usuarios.find(usuario => usuario.id == infoRequest.id_usuario)
   if (!usuario){
-    return response.status(400).json("não foi possível completar sua ligação")
+    return response.status(400).json("Usuario não encontrado")
   }
 
  let index = usuario.recados.findIndex(recado => recado.id == infoRequest.id_recado)
   if (index === -1){
-    return response.status(400).json("não foi possível completar sua ligação")
+    return response.status(400).json("Recado não encontrado")
   }
 
   usuario.recados[index] = recado_modificado
