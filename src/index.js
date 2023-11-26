@@ -4,14 +4,50 @@ import bcrypt from "bcrypt";
 const app = express();
 app.use(express.json());
 
-let lista_usuarios = []
+let lista_usuarios = [
+    [
+        {
+            id: 9999,
+            nome: "Main Reyna",
+            email: "souplatina@gmail.com",
+            senha: "NãOaBr0ObOmB",
+            recados: [ {
+                id: 777,
+                titulo: "Dropa Aí Men",
+                descricao:"To sem dinheiro, compra pra mim?"
+              }]
+        },
+        {
+            id: 9998,
+            nome: "Suporte de Dano",
+            email: "naowardo@bol.com.br",
+            senha: "opspegueiseufarm",
+            recados: [ {
+                id: 666,
+                titulo: "Lembrete",
+                descricao:"Comprar Capuz da Morte de Rabadon"
+              }]
+        },
+        {
+            id: 9997,
+            nome: "Uh Tal Du Ak TrOvÃo",
+            email: "cs.css.cs@cs.valve.com",
+            senha: "123456",
+            recados: [ {
+                id: 555,
+                titulo: "É us guri pae",
+                descricao:"Bah, né meo. Tá loko?!"
+              }]
+        }
+      ]
+]
 let contador = 0
 let contadorRecado = 0 
 
-app.post('/trabalho-final/add-user', async (request, response) => {
+app.post('/adicionar-usuario', async (request, response) => {
   const infoRequest = request.body
 
-  if (infoRequest.name === undefined || infoRequest.name === "") {
+  if (infoRequest.nome === undefined || infoRequest.nome === "") {
     return response.status(400).json("Informe um nome válido")
   }
 
@@ -19,51 +55,51 @@ app.post('/trabalho-final/add-user', async (request, response) => {
     return response.status(400).json("Informe um email válido")
   }
 
-  if (infoRequest.password === undefined || infoRequest.password === "") {
+  if (infoRequest.senha === undefined || infoRequest.senha === "") {
     return response.status(400).json("Informe uma senha válida")
   }
 
-  let user = lista_usuarios.find(item => item.email == infoRequest.email)
-  if (user){
+  let usuario = lista_usuarios.find(item => item.email == infoRequest.email)
+  if (usuario){
     return response.status(400).json("Email já cadastrado")
   }
 
-  const hashedPassword = await bcrypt.hash(infoRequest.password, 6);
+  const hashedpassword = await bcrypt.hash(infoRequest.senha, 6);
 
-  const newUser = {
+  const novoUsuario = {
       id: ++contador,
-      name: infoRequest.name,
+      nome: infoRequest.nome,
       email: infoRequest.email,
-      password: hashedPassword,
+      senha: hashedpassword,
       recados: []
   }
   
-  lista_usuarios.push(newUser)
+  lista_usuarios.push(novoUsuario)
   return response.status(201).json("Usuário adicionado com sucesso")
 });
 
-app.post('/trabalho-final/login', async (request, response) => {
+app.post('/login', async (request, response) => {
   const infoRequest = request.body
 
   if (infoRequest.email === undefined || infoRequest.email === "") {
     return response.status(400).json("Informe um email válido")
   }
 
-  if (infoRequest.password === undefined || infoRequest.password === "") {
+  if (infoRequest.senha === undefined || infoRequest.senha === "") {
     return response.status(400).json("Informe uma senha válida")
   }
 
-  let user = lista_usuarios.find(usuario => usuario.email == infoRequest.email)
-  if (!user) { 
+  let usuario = lista_usuarios.find(usuario => usuario.email == infoRequest.email)
+  if (!usuario) { 
     return response.status(400).json("Dados incorretos")
   }
 
-  const passwordCorreto = await bcrypt.compare(
-    infoRequest.password,
-    user.password
+  const senhaCorreta = await bcrypt.compare(
+    infoRequest.senha,
+    usuario.senha
   )
 
-  if (!passwordCorreto){
+  if (!senhaCorreta){
     return response.status(400).json("Dados incorretos")
   }
   
@@ -71,20 +107,20 @@ app.post('/trabalho-final/login', async (request, response) => {
 });
 
 //lembrar de mexer nessa parte aqui 
-app.get('/trabalho-final/listar-user', (request, response) => {
+app.get('/listar-usuario', (request, response) => {
     return response.json(lista_usuarios);
     
 });
 
-app.get('/trabalho-final/visualizar-user', (request, response) => {
+app.get('/visualizar-usuario', (request, response) => {
   const parametros = request.query
 
-  let user = lista_usuarios.find(usuario => usuario.id == parametros.id)
-  if (!user){
+  let usuario = lista_usuarios.find(usuario => usuario.id == parametros.id)
+  if (!usuario){
     return response.status(400).json("Usuário não encontrado")
   }
 
-  return response.json(user);
+  return response.json(usuario);
   
 });
 
@@ -92,14 +128,14 @@ app.get('/trabalho-final/visualizar-user', (request, response) => {
 
 
 //aqui a gente vai pegar o id e mudar alguma coisa nele
-app.put('/trabalho-final/edit-user', async (request, response) => {
+app.put('/alterar-usuario', async (request, response) => {
   const infoRequest = request.body
 
   if (infoRequest.id === undefined || infoRequest.id === "") {
     return response.status(400).json("Informe um id correto")
   }
 
-  if (infoRequest.name === undefined || infoRequest.name === "") {
+  if (infoRequest.nome === undefined || infoRequest.nome === "") {
     return response.status(400).json("Informe um nome válido")
   }
 
@@ -107,18 +143,18 @@ app.put('/trabalho-final/edit-user', async (request, response) => {
     return response.status(400).json("Informe um email válido")
   }
 
-  if (infoRequest.password === undefined || infoRequest.password === "") {
+  if (infoRequest.senha === undefined || infoRequest.senha === "") {
     return response.status(400).json("Informe uma senha válida")
   }
 
   
-  const hashedPassword = await bcrypt.hash(infoRequest.password, 6);
+  const hashedpassword = await bcrypt.hash(infoRequest.senha, 6);
 
-  const usuario_editado = {
+  const usuario_alterarado = {
       id: infoRequest.id,
-      name: infoRequest.name,
+      nome: infoRequest.nome,
       email: infoRequest.email,
-      password: hashedPassword,
+      senha: hashedpassword,
       recados: []
   }
 
@@ -127,8 +163,8 @@ app.put('/trabalho-final/edit-user', async (request, response) => {
     return response.status(400).json("mudar a mensagem")
   }
 
-  lista_usuarios[index] = usuario_editado
-  return response.status(201).json("Usuário editado com sucesso")
+  lista_usuarios[index] = usuario_alterarado
+  return response.status(201).json("Usuário alterarado com sucesso")
 });
 
 
@@ -138,17 +174,17 @@ app.put('/trabalho-final/edit-user', async (request, response) => {
 
 
 //aqui a gente vai deletar, né, não seja burro tbm
-app.delete('/trabalho-final/delete-user/', (request, response) => {
+app.delete('/deletar-usuario/', (request, response) => {
   const parametros = request.query
-  const idUser= parametros.id_user
+  const idUsuario= parametros.id_usuario
   // let idUsuario = idRecado <= talvez devesse validar a hash aqui, não sei, vou ver e te aviso. 
-  let user = lista_usuarios.find(usuario => usuario.id == idUser)
+  let usuario = lista_usuarios.find(usuario => usuario.id == idUsuario)
   
-  if (!user){
+  if (!usuario){
      return response.status(400).json("Usuário inválido")
   }
   
-  lista_usuarios = lista_usuarios.filter(usuario => usuario.id != idUser)
+  lista_usuarios = lista_usuarios.filter(usuario => usuario.id != idUsuario)
   return response.status(200).json('Usuario excluído com sucesso')
 });
 
@@ -172,36 +208,35 @@ app.delete('/trabalho-final/delete-user/', (request, response) => {
 
 
 //aqui a gente vai deletar, né, não seja burro tbm
-app.delete('/trabalho-final/delete-recado/', (request, response) => {
+app.delete('/deletar-recado/', (request, response) => {
   const parametros = request.query
   const idRecado = parametros.id_recado
-  const idUser= parametros.id_user
+  const idUsuario= parametros.id_usuario
   // let idUsuario = idRecado <= talvez devesse validar a hash aqui, não sei, vou ver e te aviso. 
-  let user = lista_usuarios.find(usuario => usuario.id == idUser)
+  let usuario = lista_usuarios.find(usuario => usuario.id == idUsuario)
 
-  if (!user){
+  if (!usuario){
      return response.status(400).json("Usuário inválido")
   }
 
-  let indexRecado = user.recados.findIndex(recado => recado.id == idRecado)
+  let indexRecado = usuario.recados.findIndex(recado => recado.id == idRecado)
 
   if (indexRecado === -1) {
       return response.status(400).json("Recado não encontrado")
   }
   
-    
-  user.recados = user.recados.filter(recado => recado.id != idRecado)
+  usuario.recados = usuario.recados.filter(recado => recado.id != idRecado)
   return response.status(200).json('Recado excluído com sucesso')
 });
 
 
-app.get('/trabalho-final/recados', (request, response) => {
+app.get('/recados', (request, response) => {
   return response.json('PODE CONFERIR NO POSTMAN, SE TÁ LÁ, TÁ FUNCIONANDO, PARÇA! :)');
 
 });
 
 
-app.post('/trabalho-final/add-recado', (request, response) => {
+app.post('/adicionar-recado', (request, response) => {
   const infoRequest = request.body
 
   if (infoRequest.id_usuario === undefined || infoRequest.id_usuario === "") {
@@ -216,44 +251,42 @@ app.post('/trabalho-final/add-recado', (request, response) => {
     return response.status(400).json("Informe um email válido")
   }
 
-  let user = lista_usuarios.find(usuario => usuario.id == infoRequest.id_usuario)
-  if (!user){
+  let usuario = lista_usuarios.find(usuario => usuario.id == infoRequest.id_usuario)
+  if (!usuario){
      return response.status(400).json("Usuário inválido")
   }
 
-  const newRecado = {
+  const novoRecado = {
       id: ++contadorRecado,
       titulo: infoRequest.titulo,
       descricao: infoRequest.descricao,
      
   }
   
-  user.recados.push(newRecado)
-  // console.log ('O recado "'+ newRecado.descricao +'" foi adicionado com sucesso')
-  return response.status(201).json('O recado "'+ newRecado.descricao +'" foi adicionado com sucesso' )
-  
+  usuario.recados.push(novoRecado)
+  // console.log ('O recado "'+ novoRecado.descricao +'" foi adicionado com sucesso')
+  return response.status(201).json('O recado "'+ novoRecado.descricao +'" foi adicionado com sucesso' )
 });
 
-app.get('/trabalho-final/listar-recado/:id?', (request, response) => {
+app.get('/listar-recado/:id?', (request, response) => {
   const parametros = request.query
   
-  let user = lista_usuarios.find(item => item.id == parametros.id)
-  if (user !== undefined){
-    return response.status(201).json(user.recados)
+  let usuario = lista_usuarios.find(item => item.id == parametros.id)
+  if (usuario !== undefined){
+    return response.status(201).json(usuario.recados)
   } else {
     return response.status(201).json(parametros.id)
   }
-
 });
 
-app.get('/trabalho-final/visualizar-recado', (request, response) => {
+app.get('/visualizar-recado', (request, response) => {
   const parametros = request.query
 
-  let user = lista_usuarios.find(usuario => usuario.id == parametros.id_user)
-  if (!user){
+  let usuario = lista_usuarios.find(usuario => usuario.id == parametros.id_usuario)
+  if (!usuario){
     return response.status(400).json("Recado não encontrado")
   }
-  let recado = user.recados.find(recado => recado.id == parametros.id_recado)
+  let recado = usuario.recados.find(recado => recado.id == parametros.id_recado)
   if (!recado){
     return response.status(400).json("Recado não encontrado")
   }
@@ -262,11 +295,10 @@ app.get('/trabalho-final/visualizar-recado', (request, response) => {
   
 });
 
-
-app.put('/trabalho-final/edit-recado', async (request, response) => {
+app.put('/alterar-recado', async (request, response) => {
   const infoRequest = request.body
 
-  if (infoRequest.id_user === undefined || infoRequest.id_user === "") {
+  if (infoRequest.id_usuario === undefined || infoRequest.id_usuario === "") {
     return response.status(400).json("Informe um id correto")
   }
 
@@ -286,10 +318,9 @@ app.put('/trabalho-final/edit-recado', async (request, response) => {
     id: infoRequest.id_recado,
     titulo: infoRequest.titulo,
     descricao: infoRequest.descricao,
-   
   }
   
-  let usuario = lista_usuarios.find(usuario => usuario.id == infoRequest.id_user)
+  let usuario = lista_usuarios.find(usuario => usuario.id == infoRequest.id_usuario)
   if (!usuario){
     return response.status(400).json("não foi possível completar sua ligação")
   }
@@ -300,17 +331,7 @@ app.put('/trabalho-final/edit-recado', async (request, response) => {
   }
 
   usuario.recados[index] = recado_modificado
-  return response.status(201).json("Recado editado com sucesso")
+  return response.status(201).json("Recado alterarado com sucesso")
 });
-
-
-
-
-
-
-
-
-
-
 
 app.listen(8080, () => console.log("Recadinhos Funcionandinho"));
